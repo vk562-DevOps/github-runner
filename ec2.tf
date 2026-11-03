@@ -1,23 +1,49 @@
-resource "aws_instance" "bastion" {
+
+
+resource "aws_instance" "runner" {
   ami                    = local.ami_id
-  instance_type          = var.instance_type
-  vpc_security_group_ids = [local.bastion_sg_id]
-  subnet_id              = local.subnet_id
-  user_data              = file("${path.module}/bootstrap.sh")
-  iam_instance_profile   = aws_iam_instance_profile.bastion.name
-  # root_block_device {
-  #   volume_size = 50
-  #   volume_type = "gp3"
-  # }
-  tags = merge(local.common_tags,
+  instance_type          = "t3.small"
+  vpc_security_group_ids = [aws_security_group.main.id]
+  subnet_id              = "subnet-09332e278172839a0" #replace your Subnet
+
+  # need more for terraform
+  root_block_device {
+    volume_size = 50
+    volume_type = "gp3" # or "gp2", depending on your preference
+  }
+  user_data = file("runner.sh")
+  tags = merge(
+    local.common_tags,
     {
-      Name = "${local.common_name_suffix}-bastion"
-    },
-    var.ec2_tags
+      Name = "${var.project}-runner"
+    }
   )
 }
 
-resource "aws_iam_instance_profile" "bastion" {
-  name = "bastion"
-  role = "BastionTerraformAdmin"
+resource "aws_security_group" "main" {
+  name        = "${var.project}-runner"
+  description = "Created to attatch runner"
+
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  ingress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  tags = merge(
+    local.common_tags,
+    {
+      Name = "${var.project}-runner"
+    }
+  )
 }

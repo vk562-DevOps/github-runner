@@ -5,14 +5,8 @@ variable "instance_type" {
 
 variable "project" {
   type    = string
-  default = "roboshop"
+  default = "github"
 }
-
-variable "environment" {
-  type    = string
-  default = "dev"
-}
-
 variable "ec2_tags" {
   type    = map(string)
   default = {}

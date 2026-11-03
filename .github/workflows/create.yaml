@@ -1,0 +1,36 @@
+name: runner-creation-tf
+on:
+  workflow_dispatch:
+jobs:
+  runner-tf:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v6.3.0
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: terraform setup
+        uses: hashicorp/setup-terraform@v4
+
+      - name: terraform format
+        run: terraform fmt -check
+        continue-on-error: true
+
+      - name: initialise terraform
+        run: terraform init
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+
+      - name: terraform plan
+        run: terraform plan
+
+      - name: terraform apply
+        run: terraform apply -auto-approve

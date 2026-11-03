@@ -17,11 +17,3 @@ data "aws_ami" "joindevops_ami" {
     values = ["hvm"]
   }
 }
-
-data "aws_ssm_parameter" "bastion" {
-  name = "/${var.project_name}/${var.environment}/bastion_sg_id"
-}
-
-data "aws_ssm_parameter" "public_subnets" {
-  name = "/${var.project_name}/${var.environment}/public_subnet_ids"
-}
